@@ -4,7 +4,7 @@ data/processed/
 data/outputs/
 
 # models
-models/
+models/distilbert_trace/
 
 # python
 __pycache__/
