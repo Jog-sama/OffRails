@@ -1,0 +1,16 @@
+# core
+datasets
+transformers
+torch
+scikit-learn
+xgboost
+joblib
+
+# evaluation + viz
+matplotlib
+seaborn
+numpy
+pandas
+
+# utilities
+tqdm

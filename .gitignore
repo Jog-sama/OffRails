@@ -1,0 +1,40 @@
+# data
+data/raw/
+data/processed/
+data/outputs/
+
+# models
+models/
+
+# python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+
+# jupyter
+.ipynb_checkpoints/
+notebooks/*.ipynb
+
+# environment
+.env
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# HuggingFace cache
+.cache/
