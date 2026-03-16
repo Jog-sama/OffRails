@@ -5,6 +5,7 @@ data/outputs/
 
 # models
 models/distilbert_trace/
+models/*.joblib
 
 # python
 __pycache__/

@@ -1,3 +1,10 @@
+---
+title: OffRails API
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # Agent Trace Anomaly Detection
 
 Detect when AI agents "go off the rails" — unnecessary tool calls, circular reasoning, and goal drift — by framing multi-step execution traces as a **sequence anomaly detection** problem.

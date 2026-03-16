@@ -5,6 +5,8 @@ torch
 scikit-learn
 xgboost
 joblib
+uvicorn
+fastapi
 
 # evaluation + viz
 matplotlib
