@@ -21,6 +21,9 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from contextlib import asynccontextmanager
+from app.api.routes import _state
+
 # ── Make partner's scripts/ importable ───────────────────────────────────────
 # inference.py does `from model import ...` and `from build_features import ...`
 # so we need scripts/ on sys.path.
@@ -38,10 +41,32 @@ logging.basicConfig(
     datefmt="%H:%M:%S",
 )
 
+logger = logging.getLogger(__name__)
+
 # ── App ──────────────────────────────────────────────────────────────────────
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    from huggingface_hub import hf_hub_download
+    from scripts.inference import TraceAnomalyDetector
+    try:
+        model_path = hf_hub_download(
+            repo_id="mg643/offrails-models",
+            filename="xgboost_model.joblib",
+        )
+        _state["detector"] = TraceAnomalyDetector(
+            model_dir=os.path.dirname(model_path),
+            model_type="xgboost"
+        )
+        _state["model_type"] = "xgboost"
+        logger.info("XGBoost model loaded from HF Hub")
+    except Exception as e:
+        logger.warning(f"Could not load model: {e}")
+    yield
 
 app = FastAPI(
     title="Agent Trace Anomaly Detection API",
+    lifespan=lifespan,
     description=(
         "Detects anomalous agent execution traces — unnecessary tool calls, "
         "circular reasoning, and goal drift.\n\n"
