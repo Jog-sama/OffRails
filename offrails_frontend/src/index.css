@@ -1,0 +1,56 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --beige-50: #faf7f4;
+  --beige-100: #f5f0eb;
+  --beige-200: #ede5dc;
+  --beige-300: #dfd4c8;
+  --beige-400: #c2b0ab;
+  --mauve-100: #e8dde8;
+  --mauve-200: #d4c4d4;
+  --mauve-300: #b89ab8;
+  --mauve-400: #9a759a;
+  --mauve-500: #7d5a7d;
+  --mauve-600: #5e3f5e;
+  --text-primary: #2c2422;
+  --text-secondary: #6b5a56;
+  --text-muted: #9b8a86;
+  --border: rgba(155, 115, 110, 0.18);
+  --border-hover: rgba(155, 115, 110, 0.35);
+  --green-bg: #edf5e8;
+  --green-border: #c8ddbf;
+  --green-text: #3d6b30;
+  --red-bg: #f5ddd8;
+  --red-text: #8b3a2a;
+  --amber-bg: #fde8cb;
+  --amber-text: #7a4a12;
+  --tool-bg: #dcebd4;
+}
+
+body {
+  font-family: -apple-system, 'SF Pro Display', 'SF Pro Text', BlinkMacSystemFont,
+    'Helvetica Neue', sans-serif;
+  background: var(--beige-100);
+  min-height: 100vh;
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+textarea {
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--mauve-200);
+  border-radius: 4px;
+}

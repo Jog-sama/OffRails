@@ -1,0 +1,31 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0 16px;
+}
+
+.labelTop {
+  font-size: 11px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.svg {
+  overflow: visible;
+}
+
+.chip {
+  margin-top: 12px;
+  padding: 5px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+}
+
+.normal { background: var(--green-bg); color: var(--green-text); }
+.anomalous { background: var(--red-bg); color: var(--red-text); }
+.warning { background: var(--amber-bg); color: var(--amber-text); }
