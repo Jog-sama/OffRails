@@ -191,12 +191,6 @@ result = detector.predict(conversation_json)
 - [ToolBench GitHub](https://github.com/OpenBMB/ToolBench)
 - [ToolBench HuggingFace Dataset](https://huggingface.co/datasets/tuandunghcmut/toolbench-v1)
 
-## Team
-
-- **Atharva** — ML pipeline, model training, evaluation, experiments
-- **Omkar** — Backend (FastAPI)
-- **Mrinal** — Frontend
-
 ## AI Attribution
 
 Parts of this codebase were developed with the assistance of Claude (Anthropic). All AI-generated code has been reviewed, tested, and adapted by the team.
