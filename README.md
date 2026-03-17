@@ -25,7 +25,7 @@ We build a binary classifier that takes an agent execution trace (sequence of to
 
 **Proxy labeling**: Since ToolBench doesn't include explicit pass/fail labels, we construct proxy anomaly labels by analyzing the final assistant message:
 - Contains failure language ("I cannot", "failed", "unable to") → **anomalous**
-- Zero tool calls in the trace → **anomalous**  
+- Zero tool calls (Action: ...) in the trace → **anomalous**
 - Otherwise → **normal**
 
 This labeling is intentionally imperfect — Experiment 2 (noise robustness) directly quantifies how sensitive our models are to these proxy label errors.
@@ -36,7 +36,7 @@ This labeling is intentionally imperfect — Experiment 2 (noise robustness) dir
 |-------|------|-------|-------------|
 | **Naive Baseline** | Majority class | Labels only | Always predicts the most frequent class |
 | **XGBoost** | Classical ML | 25+ handcrafted features | Gradient boosting on structural, behavioral, and linguistic features extracted from traces |
-| **DistilBERT** | Deep Learning | Raw trace text | Fine-tuned transformer that processes the full tokenized trace |
+| **DistilBERT** | Deep Learning | Compact trace text | Fine-tuned transformer on a focused input: user query + last reasoning step + last tool response + final answer |
 
 ### Handcrafted Features (XGBoost)
 
@@ -46,6 +46,40 @@ This labeling is intentionally imperfect — Experiment 2 (noise robustness) dir
 - **Linguistic**: error keywords, apology phrases, hedging language, give-up signals
 - **Positional**: where tool calls appear in the trace (early vs. late)
 - **Observation quality**: error observations, empty responses
+
+### Compact Trace Input (DistilBERT)
+
+Raw agent traces are 2000–5000+ tokens, far exceeding DistilBERT's 512-token context window. Naive truncation cuts off the end of the trace — exactly where the anomaly signals live (failure language, give-up patterns in the final response). Our solution constructs a compact ~300 token input per trace:
+
+```
+[QUERY] The original user request
+[REASONING] The second-to-last assistant turn (shows reasoning trajectory)
+[LAST_OBS] The final tool response (shows if API calls succeeded)
+[RESPONSE] The last assistant turn (where failure/success is most evident)
+```
+
+This ensures the model sees all critical signal with zero information loss from truncation. Additionally, the tokenizer uses **tail truncation** (keeps the last 512 tokens rather than the first) as a safety net for longer traces.
+
+## Trained Models
+
+**Note**: Trained model files (`models/` directory) are not included in this repository as they exceed GitHub's file size limits. To reproduce:
+
+1. Run the training pipeline (see Quick Start below), **or**
+2. Use the provided [Colab notebook](notebooks/OffRails_Train.ipynb) to train on GPU and download the model artifacts
+
+The expected contents of `models/` after training:
+```
+models/
+├── naive_baseline.joblib          (~1 KB)
+├── xgboost_model.joblib           (~2 MB)
+└── distilbert_trace/              (~260 MB)
+    ├── config.json
+    ├── model.safetensors
+    ├── tokenizer.json
+    ├── tokenizer_config.json
+    ├── vocab.txt
+    └── trace_config.json
+```
 
 ## Project Structure
 
@@ -63,12 +97,12 @@ This labeling is intentionally imperfect — Experiment 2 (noise robustness) dir
 │   ├── experiment.py       ← sensitivity + noise robustness experiments
 │   ├── tune_hyperparams.py ← XGBoost hyperparameter grid search
 │   └── inference.py        ← production inference module (for FastAPI)
-├── models/                 ← saved trained models
+├── models/                 ← saved trained models (not in repo — see note above)
 ├── data/
 │   ├── raw/                ← raw downloaded data
 │   ├── processed/          ← train/val/test splits + features
 │   └── outputs/            ← plots, metrics, experiment results
-├── notebooks/              ← exploration notebooks (not graded)
+├── notebooks/              ← Colab training notebook + exploration
 └── .gitignore
 ```
 
@@ -105,12 +139,15 @@ python setup.py --step train --model deep         # DistilBERT only
 python setup.py --step evaluate
 ```
 
-### 5. Run Inference
+### 5. Train on Google Colab (recommended for DistilBERT)
+Upload `notebooks/OffRails_Train.ipynb` to Google Colab, select a GPU runtime (L4/T4/A100), and run all cells. Download the resulting `trained_models.zip` and unzip into `models/`.
+
+### 6. Run Inference
 ```bash
 python main.py inference --trace path/to/trace.json --model_type xgboost
 ```
 
-### 6. Interactive Demo
+### 7. Interactive Demo
 ```bash
 python main.py demo
 ```
@@ -118,16 +155,16 @@ python main.py demo
 ## Experiments
 
 ### Experiment 1: Training Set Size Sensitivity
-Trains XGBoost at 10%, 25%, 50%, 75%, 100% of data with 3 random seeds each.  
+Trains XGBoost at 10%, 25%, 50%, 75%, 100% of data with 3 random seeds each.
 **Motivation**: Determines if we need more data or better features.
 
 ### Experiment 2: Label Noise Robustness
-Flips 0–25% of training labels randomly to simulate proxy label errors.  
+Flips 0–25% of training labels randomly to simulate proxy label errors.
 **Motivation**: Our labels are heuristic-based, so quantifying noise sensitivity is directly relevant. If the model is robust to 15%+ noise, our proxy labeling strategy is viable.
 
 ## Integration with Backend
 
-The `scripts/inference.py` module provides a `TraceAnomalyDetector` class that Omkar's FastAPI backend imports:
+The `scripts/inference.py` module provides a `TraceAnomalyDetector` class for the backend import:
 
 ```python
 from scripts.inference import TraceAnomalyDetector
@@ -153,6 +190,12 @@ result = detector.predict(conversation_json)
 - Qin et al., "ToolLLM: Facilitating Large Language Models to Master 16000+ Real-world APIs", ICLR 2024
 - [ToolBench GitHub](https://github.com/OpenBMB/ToolBench)
 - [ToolBench HuggingFace Dataset](https://huggingface.co/datasets/tuandunghcmut/toolbench-v1)
+
+## Team
+
+- **Atharva** — ML pipeline, model training, evaluation, experiments
+- **Omkar** — Backend (FastAPI)
+- **Mrinal** — Frontend
 
 ## AI Attribution
 
