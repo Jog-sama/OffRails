@@ -120,7 +120,7 @@ Flips 0–25% of training labels randomly to simulate proxy label errors.
 
 ## Integration with Backend
 
-The `scripts/inference.py` module provides a `TraceAnomalyDetector` class that Omkar's FastAPI backend imports:
+The `scripts/inference.py` module provides a `TraceAnomalyDetector` class for the backend import:
 
 ```python
 from scripts.inference import TraceAnomalyDetector
